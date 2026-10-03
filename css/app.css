@@ -1334,3 +1334,17 @@ body.busy .check {
     background-position: 150% 0;
   }
 }
+
+.connect-error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--late) 10%, transparent);
+  color: var(--late);
+  font-size: 13px;
+}
+
+.connect-error .xs {
+  opacity: 0.8;
+  word-break: break-word;
+}

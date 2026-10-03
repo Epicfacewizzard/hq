@@ -107,7 +107,13 @@ export class GitHubStore {
       },
     });
     if (!res.ok) {
-      const err = new Error(`GitHub ${res.status}`);
+      let detail = '';
+      try {
+        detail = (await res.json()).message || '';
+      } catch {
+        /* no JSON body */
+      }
+      const err = new Error(`GitHub ${res.status}${detail ? ': ' + detail : ''}`);
       err.status = res.status;
       throw err;
     }

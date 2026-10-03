@@ -648,10 +648,29 @@ async function connect(form) {
     location.hash = '#/today';
   } catch (e) {
     console.error(e);
-    toast(e.status === 401 ? 'That key did not work' : /not found|empty/i.test(e.message) ? 'Repo not found for that key' : 'Could not connect');
+    connectError(form, e);
   } finally {
     document.body.classList.remove('busy');
   }
+}
+
+// Say why connecting failed in plain words, and keep GitHub's own message underneath.
+function connectError(form, e) {
+  const m = String(e.message || e);
+  let why = 'Could not connect.';
+  if (e.status === 401 || /bad credentials/i.test(m)) why = "GitHub didn't accept that key. Copy it again (it starts with github_pat_).";
+  else if (/could not resolve|not found|empty/i.test(m))
+    why = "The key can't see the vault repo. On the key: Repository access → Only select repositories → vault.";
+  else if (e.status === 403 || /not accessible|forbidden|permission/i.test(m))
+    why = 'The key is missing a permission. On the key: Repository permissions → Contents → Read and write.';
+  else if (e instanceof TypeError) why = "Couldn't reach GitHub. Check your internet and try again.";
+  let box = form.querySelector('.connect-error');
+  if (!box) {
+    box = document.createElement('p');
+    box.className = 'connect-error';
+    form.querySelector('.form-foot').before(box);
+  }
+  box.innerHTML = `${esc(why)}<br><span class="xs">GitHub said: ${esc(m)}</span>`;
 }
 
 // pick up changes made on the laptop when coming back to the app
